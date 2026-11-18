@@ -53,27 +53,34 @@ class Command(BaseCommand):
         for data in self.DEMO_USERS:
             email = data["email"]
 
+            # Never modify an existing account.
             if CustomUser.objects.filter(email=email).exists():
                 self.stdout.write(
-                    self.style.WARNING(f"Already exists; left unchanged: {email}")
+                    self.style.WARNING(
+                        f"Already exists; left unchanged: {email}"
+                    )
                 )
                 existing_count += 1
                 continue
 
             user_data = data.copy()
             password = user_data.pop("password")
+            user_data.pop("email")
 
-            user = CustomUser.objects.create_user(
+            CustomUser.objects.create_user(
                 email=email,
                 password=password,
                 **user_data,
             )
 
-            self.stdout.write(self.style.SUCCESS(f"Created: {user.email}"))
+            self.stdout.write(
+                self.style.SUCCESS(f"Created: {email}")
+            )
             created_count += 1
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Finished. Created: {created_count}, Already existed: {existing_count}"
+                f"Finished. Created: {created_count}, "
+                f"Already existed: {existing_count}"
             )
         )
