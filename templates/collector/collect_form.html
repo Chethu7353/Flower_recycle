@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Record Flower Collection — SONPK Collector{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <a href="{% url 'collector_dashboard' %}" class="text-muted text-decoration-none small d-inline-flex align-items-center mb-3">
+        <i class="bi bi-arrow-left me-1"></i>Back to Collector Dashboard
+      </a>
+
+      <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+        
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div class="p-3 rounded-circle bg-success bg-opacity-15 text-success">
+            <i class="bi bi-check2-circle fs-2"></i>
+          </div>
+          <div>
+            <span class="badge bg-success bg-opacity-20 text-success rounded-pill px-3 py-1 fw-bold small">Collection Action</span>
+            <h1 class="h4 fw-bold text-dark mb-0">Record Flower Collection</h1>
+            <p class="text-muted small mb-0">Verify weight and confirm the pickup of this flower batch.</p>
+          </div>
+        </div>
+
+        <!-- Submission & Temple Details Summary Box -->
+        <div class="p-4 rounded-4 bg-light border mb-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <span class="text-muted small d-block">Temple Name & Location</span>
+              <strong class="fs-5 text-dark d-block">{{ submission.temple.name }}</strong>
+              <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ submission.temple.address }}, {{ submission.temple.city }}</div>
+            </div>
+            <div class="col-md-6">
+              <span class="text-muted small d-block">Temple Contact</span>
+              <strong class="text-dark d-block">{{ submission.temple.contact_person|default:"Temple Coordinator" }}</strong>
+              <div class="text-muted small"><i class="bi bi-telephone me-1"></i>{{ submission.temple.contact_number }}</div>
+            </div>
+            <hr class="my-1">
+            <div class="col-sm-4">
+              <span class="text-muted small d-block">Flower Variety</span>
+              <strong class="text-dark">{{ submission.flower_type }}</strong>
+            </div>
+            <div class="col-sm-4">
+              <span class="text-muted small d-block">Submitted Weight</span>
+              <strong class="text-primary fs-5">{{ submission.weight }} kg</strong>
+            </div>
+            <div class="col-sm-4">
+              <span class="text-muted small d-block">Date Submitted</span>
+              <strong class="text-dark">{{ submission.submission_date|date:"d M Y" }}</strong>
+            </div>
+            {% if submission.remarks %}
+              <div class="col-12">
+                <span class="text-muted small d-block">Temple Remarks</span>
+                <span class="text-secondary small fst-italic">"{{ submission.remarks }}"</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Collection Verification Form -->
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2 small mb-3">
+              {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="{{ form.collected_weight.id_for_label }}" class="form-label small fw-bold">
+                Actual Collected Weight (kg) <span class="text-danger">*</span>
+              </label>
+              {{ form.collected_weight }}
+              <div class="form-text small">Enter verified scale weight in kg. Must be > 0.</div>
+              {% if form.collected_weight.errors %}<div class="text-danger small mt-1">{{ form.collected_weight.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.collected_at.id_for_label }}" class="form-label small fw-bold">
+                Collection Date & Time <span class="text-danger">*</span>
+              </label>
+              {{ form.collected_at }}
+              <div class="form-text small">Timestamp of actual physical pickup.</div>
+              {% if form.collected_at.errors %}<div class="text-danger small mt-1">{{ form.collected_at.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="{{ form.remarks.id_for_label }}" class="form-label small fw-bold">
+              Collector Observations & Notes (Optional)
+            </label>
+            {{ form.remarks }}
+            {% if form.remarks.errors %}<div class="text-danger small mt-1">{{ form.remarks.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="alert alert-success bg-opacity-10 border-success border-opacity-25 p-3 rounded-3 small text-success mb-4">
+            <i class="bi bi-shield-check me-1"></i>
+            Upon confirmation, the status will automatically update to <strong>Collected</strong> on the Temple Owner's dashboard, and this record will be logged permanently under your name (<strong>{{ user.full_name }}</strong>).
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end">
+            <a href="{% url 'collector_dashboard' %}" class="btn btn-outline-secondary px-4 fw-semibold">Cancel</a>
+            <button type="submit" class="btn btn-success px-4 fw-bold shadow-sm">
+              <i class="bi bi-check-lg me-1"></i>Confirm & Save Collection
+            </button>
+          </div>
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

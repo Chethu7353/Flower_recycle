@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ temple.name }} — Temple Overview{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <a href="{% url 'admin_temples_list' %}" class="text-muted text-decoration-none small d-inline-flex align-items-center mb-2">
+        <i class="bi bi-arrow-left me-1"></i>Back to Temples Directory
+      </a>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge bg-warning bg-opacity-20 text-dark rounded-pill px-3 py-1 fw-bold">Temple Details</span>
+      </div>
+      <h1 class="h3 fw-black text-dark mb-0">{{ temple.name }}</h1>
+      <p class="text-muted small mb-0"><i class="bi bi-geo-alt me-1"></i>{{ temple.address }}, {{ temple.city }} ({{ temple.state }})</p>
+    </div>
+
+    <div>
+      <a href="{% url 'admin_temple_edit' temple.pk %}" class="btn btn-outline-secondary fw-semibold px-3">
+        <i class="bi bi-pencil me-1"></i>Edit Temple
+      </a>
+    </div>
+  </div>
+
+  <!-- Temple Profile & Metrics Grid -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+        <h5 class="fw-bold text-dark mb-3">Coordinator Information</h5>
+        <div class="mb-3">
+          <span class="text-muted small d-block">Assigned Temple Owner</span>
+          {% if temple.owner %}
+            <strong class="text-dark">{{ temple.owner.full_name }}</strong>
+            <div class="text-muted small">{{ temple.owner.email }}</div>
+            <div class="text-muted small">{{ temple.owner.phone }}</div>
+          {% else %}
+            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">Unassigned</span>
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <span class="text-muted small d-block">Contact Person / Priest</span>
+          <strong class="text-dark">{{ temple.contact_person|default:"Temple Office" }}</strong>
+        </div>
+        <div class="mb-3">
+          <span class="text-muted small d-block">Phone Number</span>
+          <strong class="text-dark">{{ temple.contact_number }}</strong>
+        </div>
+        <div>
+          <span class="text-muted small d-block">Enrolled Date</span>
+          <span class="text-secondary small">{{ temple.created_at|date:"d M Y" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+          <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Submissions</span>
+            <span class="display-6 fw-black text-dark">{{ total_submissions }}</span>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Completed Pickups</span>
+            <span class="display-6 fw-black text-success">{{ completed_collections }}</span>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Weight</span>
+            <span class="display-6 fw-black text-primary">{{ total_collected_weight|floatformat:1 }} <small class="fs-6 text-muted">kg</small></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submissions History Table -->
+      <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+        <div class="card-header bg-white border-bottom p-3">
+          <h5 class="fw-bold mb-0 text-dark">Flower Submissions & Collection Activity</h5>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light text-muted text-uppercase">
+              <tr>
+                <th class="ps-3">Date</th>
+                <th>Variety</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Collected By</th>
+                <th class="text-end pe-3">Verified Weight</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sub in submissions %}
+                <tr>
+                  <td class="ps-3 fw-semibold text-dark">{{ sub.submission_date|date:"d M Y" }}</td>
+                  <td>{{ sub.flower_type }}</td>
+                  <td><span class="badge bg-light text-dark border">{{ sub.weight }} kg</span></td>
+                  <td>
+                    {% if sub.status == 'COLLECTED' %}
+                      <span class="badge-status-pill badge-collected">Collected</span>
+                    {% elif sub.status == 'PENDING' %}
+                      <span class="badge-status-pill badge-pending">Pending</span>
+                    {% else %}
+                      <span class="badge-status-pill badge-submitted">Submitted</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if sub.collection_record %}
+                      {{ sub.collection_record.collector.full_name }}
+                    {% else %}
+                      <span class="text-muted">—</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end pe-3 fw-bold text-success">
+                    {% if sub.collection_record %}
+                      {{ sub.collection_record.collected_weight }} kg
+                    {% else %}
+                      <span class="text-muted">—</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="6" class="text-center py-4 text-muted">No flower submissions recorded for this temple yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

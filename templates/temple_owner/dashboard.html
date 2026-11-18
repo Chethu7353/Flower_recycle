@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Temple Owner Dashboard — PushpaRecycle{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Top Header with Actions -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge bg-warning bg-opacity-20 text-dark rounded-pill px-3 py-1 fw-bold">Temple Owner Module</span>
+        <span class="text-muted small">| Logged in as {{ user.full_name }}</span>
+      </div>
+      <h1 class="h3 fw-black text-dark mb-0">
+        {% if temple %}{{ temple.name }}{% else %}My Temple Dashboard{% endif %}
+      </h1>
+      {% if temple %}
+        <p class="text-muted small mb-0"><i class="bi bi-geo-alt me-1"></i>{{ temple.address }}, {{ temple.city }} ({{ temple.state }})</p>
+      {% endif %}
+    </div>
+
+    <div class="d-flex gap-2">
+      <a href="{% url 'temple_submit_flower' %}" class="btn btn-warning fw-bold px-3 shadow-sm">
+        <i class="bi bi-plus-circle me-1"></i>Submit Flowers
+      </a>
+      <a href="{% url 'temple_profile' %}" class="btn btn-outline-secondary fw-semibold px-3">
+        <i class="bi bi-gear me-1"></i>Edit Temple Details
+      </a>
+    </div>
+  </div>
+
+  <!-- Temple Profile Warning if not set up -->
+  {% if not temple %}
+    <div class="alert alert-warning border-0 shadow-sm p-4 rounded-4 mb-4">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-exclamation-triangle-fill fs-1 text-warning"></i>
+        <div>
+          <h5 class="fw-bold mb-1">Temple Information Required</h5>
+          <p class="mb-2 text-secondary small">Please enter your temple name, address, and contact details to begin submitting flower waste.</p>
+          <a href="{% url 'temple_profile' %}" class="btn btn-sm btn-warning fw-bold">Complete Temple Profile</a>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Overview Statistics Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">Total Submissions</span>
+          <span class="p-2 rounded-circle bg-light text-primary"><i class="bi bi-inbox-fill"></i></span>
+        </div>
+        <div class="display-6 fw-black text-dark">{{ total_submissions }}</div>
+        <div class="text-muted small">Logged flower batches</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">Pending Pickup</span>
+          <span class="p-2 rounded-circle bg-warning bg-opacity-15 text-warning"><i class="bi bi-hourglass-split"></i></span>
+        </div>
+        <div class="display-6 fw-black text-warning">{{ pending_count }}</div>
+        <div class="text-muted small">Awaiting SONPK collector</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">Collected</span>
+          <span class="p-2 rounded-circle bg-success bg-opacity-15 text-success"><i class="bi bi-check-circle-fill"></i></span>
+        </div>
+        <div class="display-6 fw-black text-success">{{ collected_count }}</div>
+        <div class="text-muted small">Successfully collected</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">Total Waste Diverted</span>
+          <span class="p-2 rounded-circle bg-info bg-opacity-15 text-info"><i class="bi bi-recycle"></i></span>
+        </div>
+        <div class="display-6 fw-black text-dark">{{ total_submitted_weight|floatformat:1 }} <small class="fs-6 text-muted">kg</small></div>
+        <div class="text-muted small">Sent for bio-conversion</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Previously Submitted Flower Records -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
+    <div class="card-header bg-white border-bottom p-3 p-md-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+      <div>
+        <h4 class="h5 fw-bold mb-0">Flower Submission History</h4>
+        <p class="text-muted small mb-0">Track the real-time collection status of your temple's flower submissions.</p>
+      </div>
+
+      <!-- Status Filter Tabs -->
+      <div class="btn-group btn-group-sm" role="group">
+        <a href="{% url 'temple_dashboard' %}" class="btn {% if not current_status_filter %}btn-dark{% else %}btn-outline-secondary{% endif %}">All</a>
+        <a href="{% url 'temple_dashboard' %}?status=SUBMITTED" class="btn {% if current_status_filter == 'SUBMITTED' %}btn-info text-white{% else %}btn-outline-secondary{% endif %}">Submitted</a>
+        <a href="{% url 'temple_dashboard' %}?status=PENDING" class="btn {% if current_status_filter == 'PENDING' %}btn-warning{% else %}btn-outline-secondary{% endif %}">Pending</a>
+        <a href="{% url 'temple_dashboard' %}?status=COLLECTED" class="btn {% if current_status_filter == 'COLLECTED' %}btn-success{% else %}btn-outline-secondary{% endif %}">Collected</a>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light text-muted small text-uppercase">
+          <tr>
+            <th class="ps-4">Submission Date</th>
+            <th>Flower Type</th>
+            <th>Submitted Weight</th>
+            <th>Current Status</th>
+            <th>Collection Details</th>
+            <th>Remarks</th>
+            <th class="text-end pe-4">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sub in submissions %}
+            <tr>
+              <td class="ps-4 fw-semibold text-dark">
+                {{ sub.submission_date|date:"d M Y" }}
+                <div class="text-muted small">{{ sub.created_at|time:"h:i A" }}</div>
+              </td>
+              <td>
+                <span class="fw-bold text-dark">{{ sub.flower_type }}</span>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border px-2 py-1 fs-6">{{ sub.weight }} kg</span>
+              </td>
+              <td>
+                {% if sub.status == 'COLLECTED' %}
+                  <span class="badge-status-pill badge-collected"><i class="bi bi-check-circle-fill me-1"></i>Collected</span>
+                {% elif sub.status == 'PENDING' %}
+                  <span class="badge-status-pill badge-pending"><i class="bi bi-hourglass-split me-1"></i>Pending Collection</span>
+                {% else %}
+                  <span class="badge-status-pill badge-submitted"><i class="bi bi-clock-history me-1"></i>Submitted</span>
+                {% endif %}
+              </td>
+              <td class="small">
+                {% if sub.collection_record %}
+                  <div class="text-dark fw-semibold"><i class="bi bi-truck text-success me-1"></i>{{ sub.collection_record.collector.full_name }}</div>
+                  <div class="text-muted">{{ sub.collection_record.collected_at|date:"d M, h:i A" }} ({{ sub.collection_record.collected_weight }} kg)</div>
+                {% else %}
+                  <span class="text-muted fst-italic">Awaiting collector visit</span>
+                {% endif %}
+              </td>
+              <td class="small text-muted text-truncate" style="max-width: 180px;">
+                {{ sub.remarks|default:"—" }}
+              </td>
+              <td class="text-end pe-4">
+                <a href="{% url 'temple_submission_detail' sub.pk %}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-eye"></i> View
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                No flower submissions found for this filter.
+                <div class="mt-2">
+                  <a href="{% url 'temple_submit_flower' %}" class="btn btn-sm btn-warning fw-bold">Submit Your First Batch</a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

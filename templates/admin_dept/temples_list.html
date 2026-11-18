@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Temple Directory — Admin Department{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <a href="{% url 'admin_dashboard' %}" class="text-muted text-decoration-none small d-inline-flex align-items-center mb-2">
+        <i class="bi bi-arrow-left me-1"></i>Back to Admin Dashboard
+      </a>
+      <h1 class="h3 fw-black text-dark mb-0">Registered Temples Directory</h1>
+      <p class="text-muted small mb-0">Monitor temple profiles, assigned owners, and cumulative collection volumes.</p>
+    </div>
+
+    <div>
+      <a href="{% url 'admin_temple_create' %}" class="btn btn-warning fw-bold px-3 shadow-sm">
+        <i class="bi bi-building-add me-1"></i>Register New Temple
+      </a>
+    </div>
+  </div>
+
+  <!-- Search Filter -->
+  <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-9">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" name="q" value="{{ q }}" class="form-control border-start-0" placeholder="Search by temple name, city, state, or address...">
+        </div>
+      </div>
+      <div class="col-md-3 d-flex gap-1">
+        <button type="submit" class="btn btn-warning fw-bold w-100">Search</button>
+        {% if q %}
+          <a href="{% url 'admin_temples_list' %}" class="btn btn-outline-secondary" title="Clear Search"><i class="bi bi-x-lg"></i></a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Temples Table -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light text-muted small text-uppercase">
+          <tr>
+            <th class="ps-4">Temple Name</th>
+            <th>Location</th>
+            <th>Contact Coordinator</th>
+            <th>Assigned Temple Owner</th>
+            <th>Total Submissions</th>
+            <th>Total Collected</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in temples %}
+            <tr>
+              <td class="ps-4">
+                <a href="{% url 'admin_temple_detail' t.pk %}" class="fw-bold text-dark text-decoration-none d-block">
+                  <i class="bi bi-building me-1 text-warning"></i>{{ t.name }}
+                </a>
+                <span class="text-muted small">{{ t.address|truncatechars:40 }}</span>
+              </td>
+              <td>
+                <span class="text-dark">{{ t.city|default:"—" }}</span>
+                <div class="text-muted small">{{ t.state|default:"" }}</div>
+              </td>
+              <td class="small">
+                <div>{{ t.contact_person|default:"Temple Office" }}</div>
+                <div class="text-muted">{{ t.contact_number }}</div>
+              </td>
+              <td>
+                {% if t.owner %}
+                  <span class="fw-semibold text-dark">{{ t.owner.full_name }}</span>
+                  <div class="text-muted small">{{ t.owner.email }}</div>
+                {% else %}
+                  <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">Unassigned</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ t.submission_count }} batches</span>
+              </td>
+              <td>
+                <span class="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25 px-2 py-1">
+                  {{ t.total_collected|default:"0"|floatformat:1 }} kg
+                </span>
+              </td>
+              <td class="text-end pe-4">
+                <div class="d-inline-flex gap-1">
+                  <a href="{% url 'admin_temple_detail' t.pk %}" class="btn btn-sm btn-outline-secondary" title="View Temple Analytics">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="{% url 'admin_temple_edit' t.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit Temple">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">
+                <i class="bi bi-building fs-2 d-block mb-2 text-secondary"></i>
+                No temples found matching your search.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

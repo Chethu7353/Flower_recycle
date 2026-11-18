@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | PushpaRecycle{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-panel wide">
+    <p class="eyebrow dark">Collection Management</p>
+    <h1>{{ title }}</h1>
+    <form method="post" class="stacked-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        <label>{{ field.label }}{{ field }}{{ field.errors }}</label>
+      {% endfor %}
+      <button class="btn btn-success w-100" type="submit">Save Collection</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

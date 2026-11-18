@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | PushpaRecycle{% endblock %}
+{% block content %}
+{{ monthly|json_script:"monthly-data" }}
+{{ temple_wise|json_script:"temple-data" }}
+{{ flower_wise|json_script:"flower-data" }}
+<section class="page-header">
+  <div class="container">
+    <p class="eyebrow dark">Admin Dashboard</p>
+    <h1>Operational Overview</h1>
+  </div>
+</section>
+<section class="content-band py-5">
+  <div class="container">
+    <div class="row g-3 mb-4">
+      <div class="col-md-3"><div class="metric-card"><span>{{ total_temples }}</span><p>Total Temples</p></div></div>
+      <div class="col-md-3"><div class="metric-card"><span>{{ total_collectors }}</span><p>Total Collectors</p></div></div>
+      <div class="col-md-3"><div class="metric-card"><span>{{ total_collections }}</span><p>Total Collections</p></div></div>
+      <div class="col-md-3"><div class="metric-card"><span>{{ total_waste }}</span><p>Kg Flower Waste</p></div></div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-7"><div class="chart-panel"><h2>Monthly Collections</h2><canvas id="monthlyChart"></canvas></div></div>
+      <div class="col-lg-5"><div class="chart-panel"><h2>Temple-wise Collections</h2><canvas id="templeChart"></canvas></div></div>
+      <div class="col-12"><div class="chart-panel"><h2>Flower-wise Collections</h2><canvas id="flowerChart"></canvas></div></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  window.PushpaRecycleCharts = {
+    monthly: JSON.parse(document.getElementById("monthly-data").textContent),
+    temple: JSON.parse(document.getElementById("temple-data").textContent),
+    flower: JSON.parse(document.getElementById("flower-data").textContent)
+  };
+</script>
+{% endblock %}

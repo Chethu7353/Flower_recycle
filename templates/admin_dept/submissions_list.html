@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}All Submissions — Admin Department{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <a href="{% url 'admin_dashboard' %}" class="text-muted text-decoration-none small d-inline-flex align-items-center mb-2">
+        <i class="bi bi-arrow-left me-1"></i>Back to Admin Dashboard
+      </a>
+      <h1 class="h3 fw-black text-dark mb-0">Master Flower Submissions Registry</h1>
+      <p class="text-muted small mb-0">Complete audit trail of all temple submissions and current lifecycle states.</p>
+    </div>
+  </div>
+
+  <!-- Multi-Factor Filter Bar -->
+  <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-3">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" name="q" value="{{ q }}" class="form-control border-start-0" placeholder="Search keywords...">
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <select name="temple" class="form-select">
+          <option value="">All Temples</option>
+          {% for t in all_temples %}
+            <option value="{{ t.id }}" {% if selected_temple == t.id|stringformat:"s" %}selected{% endif %}>{{ t.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <select name="flower_type" class="form-select">
+          <option value="">All Varieties</option>
+          {% for ft in flower_types %}
+            <option value="{{ ft }}" {% if selected_flower == ft %}selected{% endif %}>{{ ft }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <select name="status" class="form-select">
+          <option value="">All Statuses</option>
+          {% for code, label in status_choices %}
+            <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <input type="date" name="date" value="{{ selected_date }}" class="form-control" title="Filter by submission date">
+      </div>
+
+      <div class="col-md-1 d-flex gap-1">
+        <button type="submit" class="btn btn-primary fw-bold w-100" title="Apply Filters"><i class="bi bi-filter"></i></button>
+        {% if q or selected_temple or selected_flower or selected_status or selected_date %}
+          <a href="{% url 'admin_submissions_list' %}" class="btn btn-outline-secondary" title="Clear Filters"><i class="bi bi-x-lg"></i></a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Submissions Master Table -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light text-muted small text-uppercase">
+          <tr>
+            <th class="ps-4">ID / Date</th>
+            <th>Temple Name</th>
+            <th>Flower Variety</th>
+            <th>Weight</th>
+            <th>Current Status</th>
+            <th>Collection Details</th>
+            <th>Submitted By</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sub in submissions %}
+            <tr>
+              <td class="ps-4">
+                <span class="fw-bold text-dark">#{{ sub.id }}</span>
+                <div class="text-muted small">{{ sub.submission_date|date:"d M Y" }}</div>
+              </td>
+              <td>
+                <a href="{% url 'admin_temple_detail' sub.temple.pk %}" class="fw-semibold text-dark text-decoration-none">
+                  {{ sub.temple.name }}
+                </a>
+                <div class="text-muted small">{{ sub.temple.city }}</div>
+              </td>
+              <td>
+                <span class="fw-bold text-dark">{{ sub.flower_type }}</span>
+                {% if sub.remarks %}
+                  <div class="text-muted small text-truncate" style="max-width: 180px;">"{{ sub.remarks }}"</div>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border fs-6 px-2 py-1">{{ sub.weight }} kg</span>
+              </td>
+              <td>
+                {% if sub.status == 'COLLECTED' %}
+                  <span class="badge-status-pill badge-collected"><i class="bi bi-check-circle-fill me-1"></i>Collected</span>
+                {% elif sub.status == 'PENDING' %}
+                  <span class="badge-status-pill badge-pending"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
+                {% else %}
+                  <span class="badge-status-pill badge-submitted"><i class="bi bi-clock-history me-1"></i>Submitted</span>
+                {% endif %}
+              </td>
+              <td class="small">
+                {% if sub.collection_record %}
+                  <div class="fw-semibold text-dark"><i class="bi bi-truck text-success me-1"></i>{{ sub.collection_record.collector.full_name }}</div>
+                  <div class="text-muted">{{ sub.collection_record.collected_at|date:"d M Y, h:i A" }} ({{ sub.collection_record.collected_weight }} kg)</div>
+                {% else %}
+                  <span class="text-muted fst-italic">Pending pickup</span>
+                {% endif %}
+              </td>
+              <td class="small text-muted">
+                {{ sub.submitted_by.full_name|default:sub.temple.owner.full_name|default:"Temple Owner" }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                No submissions found matching your filter parameters.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

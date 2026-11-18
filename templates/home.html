@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}PushpaRecycle | Home{% endblock %}
+{% block content %}
+<section class="hero-section">
+  <div class="hero-overlay"></div>
+  <div class="container hero-content">
+    <div class="row align-items-center min-vh-100">
+      <div class="col-lg-7">
+        <p class="eyebrow">Sacred waste, sustainable soil</p>
+        <h1>Transform Temple Flowers Into Fertilizer</h1>
+        <p class="hero-subtitle">Join our mission to convert sacred offerings into sustainable organic fertilizers.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a class="btn btn-success btn-lg" href="{% url 'collection_list' %}">Browse Collections</a>
+          <a class="btn btn-outline-light btn-lg" href="{% url 'register' %}">Become Collector</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-strip">
+  <div class="container">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="stat-card"><span class="counter" data-target="{{ temple_count }}">0</span><p>Partner Temples</p></div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card"><span class="counter" data-target="{{ collector_count }}">0</span><p>Active Collectors</p></div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card"><span class="counter" data-target="{{ recycled_tons }}">0</span><p>Tonnes Flowers Recycled</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-band py-5">
+  <div class="container">
+    <div class="section-heading">
+      <p class="eyebrow dark">Network</p>
+      <h2>From morning offerings to verified collections</h2>
+    </div>
+    <div class="row g-4">
+      {% for temple in featured_temples %}
+        <div class="col-md-4">
+          <article class="feature-card">
+            {% if temple.image %}<img src="{{ temple.image.url }}" alt="{{ temple.name }}">{% else %}<div class="image-fallback temple-bg"></div>{% endif %}
+            <div class="p-4">
+              <h3>{{ temple.name }}</h3>
+              <p>{{ temple.city }}, {{ temple.state }}</p>
+              <a href="{{ temple.get_absolute_url }}">View Collections</a>
+            </div>
+          </article>
+        </div>
+      {% empty %}
+        <div class="col-md-4"><div class="feature-card p-4"><h3>Temple Onboarding</h3><p>Add partner temples through admin to populate live cards.</p></div></div>
+        <div class="col-md-4"><div class="feature-card p-4"><h3>Collector Routes</h3><p>Assign collectors to temples and track pickups.</p></div></div>
+        <div class="col-md-4"><div class="feature-card p-4"><h3>Fertilizer Ready</h3><p>Measure flower quality and processing potential.</p></div></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

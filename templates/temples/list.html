@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Temples | PushpaRecycle{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <p class="eyebrow dark">Temple Management</p>
+    <h1>Partner Temples</h1>
+    <form class="filter-bar" method="get">
+      <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Search by temple name">
+      <select name="city"><option value="">City</option>{% for item in cities %}<option value="{{ item }}" {% if request.GET.city == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+      <select name="state"><option value="">State</option>{% for item in states %}<option value="{{ item }}" {% if request.GET.state == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+      <button class="btn btn-success" type="submit">Search</button>
+    </form>
+  </div>
+</section>
+<section class="content-band py-5">
+  <div class="container">
+    <div class="row g-4">
+      {% for temple in temples %}
+        <div class="col-lg-4 col-md-6">
+          <article class="data-card">
+            {% if temple.image %}<img src="{{ temple.image.url }}" alt="{{ temple.name }}">{% else %}<div class="image-fallback temple-bg"></div>{% endif %}
+            <div class="p-4">
+              <h2>{{ temple.name }}</h2>
+              <p>{{ temple.address }}</p>
+              <dl class="mini-list">
+                <dt>Pickup</dt><dd>{{ temple.pickup_time }}</dd>
+                <dt>Contact</dt><dd>{{ temple.contact_number }}</dd>
+                <dt>Daily Quantity</dt><dd>{{ temple.daily_flower_quantity }} kg</dd>
+              </dl>
+              <a class="btn btn-outline-success w-100" href="{{ temple.get_absolute_url }}">View Collections</a>
+            </div>
+          </article>
+        </div>
+      {% empty %}
+        <p class="empty-state">No temples match the current filters.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

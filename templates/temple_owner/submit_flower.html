@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Submit Flower Waste — PushpaRecycle{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      
+      <!-- Back Navigation -->
+      <a href="{% url 'temple_dashboard' %}" class="text-muted text-decoration-none small d-inline-flex align-items-center mb-3">
+        <i class="bi bi-arrow-left me-1"></i>Back to Temple Dashboard
+      </a>
+
+      <!-- Submission Card -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div class="p-3 rounded-circle bg-warning bg-opacity-15 text-warning">
+            <i class="bi bi-flower1 fs-2"></i>
+          </div>
+          <div>
+            <span class="badge bg-warning bg-opacity-20 text-dark rounded-pill px-3 py-1 fw-bold small">Temple Owner Action</span>
+            <h1 class="h4 fw-bold text-dark mb-0">Record Flower Submission</h1>
+            <p class="text-muted small mb-0">Log your temple's daily flowers for SONPK Collector pickup.</p>
+          </div>
+        </div>
+
+        <!-- Associated Temple Badge -->
+        <div class="p-3 rounded-3 bg-light border mb-4 d-flex align-items-center justify-content-between">
+          <div>
+            <div class="text-muted small">Temple Registered:</div>
+            <strong class="text-dark">{{ temple.name }}</strong>
+            <div class="text-muted small">{{ temple.address }}, {{ temple.city }}</div>
+          </div>
+          <span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-1">Active</span>
+        </div>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2 small mb-3">
+              {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if form.temple.is_hidden %}
+            {{ form.temple }}
+          {% else %}
+            <div class="mb-3">
+              <label for="{{ form.temple.id_for_label }}" class="form-label small fw-bold">Select Temple</label>
+              {{ form.temple }}
+              {% if form.temple.errors %}<div class="text-danger small mt-1">{{ form.temple.errors.0 }}</div>{% endif %}
+            </div>
+          {% endif %}
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-7">
+              <label for="{{ form.flower_type.id_for_label }}" class="form-label small fw-bold">
+                Flower Type / Variety <span class="text-danger">*</span>
+              </label>
+              {{ form.flower_type }}
+              <datalist id="flower-type-suggestions">
+                <option value="Marigold (Genda)">
+                <option value="Rose (Gulab)">
+                <option value="Jasmine (Mogra)">
+                <option value="Lotus (Kamal)">
+                <option value="Hibiscus (Gudhal)">
+                <option value="Chrysanthemum (Sevanti)">
+                <option value="Mixed Puja Flowers">
+              </datalist>
+              <div class="form-text small">{{ form.flower_type.help_text }}</div>
+              {% if form.flower_type.errors %}<div class="text-danger small mt-1">{{ form.flower_type.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-5">
+              <label for="{{ form.weight.id_for_label }}" class="form-label small fw-bold">
+                Weight in Kilograms (kg) <span class="text-danger">*</span>
+              </label>
+              {{ form.weight }}
+              <div class="form-text small">Must be greater than 0 kg.</div>
+              {% if form.weight.errors %}<div class="text-danger small mt-1">{{ form.weight.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.submission_date.id_for_label }}" class="form-label small fw-bold">
+              Submission Date <span class="text-danger">*</span>
+            </label>
+            {{ form.submission_date }}
+            {% if form.submission_date.errors %}<div class="text-danger small mt-1">{{ form.submission_date.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="mb-4">
+            <label for="{{ form.remarks.id_for_label }}" class="form-label small fw-bold">Additional Remarks (Optional)</label>
+            {{ form.remarks }}
+            {% if form.remarks.errors %}<div class="text-danger small mt-1">{{ form.remarks.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end">
+            <a href="{% url 'temple_dashboard' %}" class="btn btn-outline-secondary px-4 fw-semibold">Cancel</a>
+            <button type="submit" class="btn btn-warning px-4 fw-bold shadow-sm">
+              <i class="bi bi-check2-circle me-1"></i>Confirm & Submit Flowers
+            </button>
+          </div>
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

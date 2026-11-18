@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ flower.name }} | PushpaRecycle{% endblock %}
+{% block content %}
+<section class="detail-hero">
+  <div class="container">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-5">
+        {% if flower.image %}<img class="detail-image" src="{{ flower.image.url }}" alt="{{ flower.name }}">{% else %}<div class="detail-image image-fallback flower-bg"></div>{% endif %}
+      </div>
+      <div class="col-lg-7">
+        <p class="eyebrow dark">{{ flower.get_quality_display }}</p>
+        <h1>{{ flower.name }}</h1>
+        <dl class="detail-list two-col">
+          <dt>Nitrogen Content</dt><dd>{{ flower.nitrogen_content }}</dd>
+          <dt>Freshness Duration</dt><dd>{{ flower.freshness_duration }}</dd>
+          <dt>Decomposition Rate</dt><dd>{{ flower.decomposition_rate }}</dd>
+          <dt>Fertilizer Potential</dt><dd>{{ flower.fertilizer_potential }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="content-band py-5">
+  <div class="container narrow-copy">
+    <h2>Full Description</h2>
+    <p>{{ flower.description|default:"Add a full flower description from the admin panel." }}</p>
+    <h2>Scientific Information</h2>
+    <p>{{ flower.scientific_information|default:"Scientific composting details can be maintained here." }}</p>
+    <h2>Usage In Fertilizer Production</h2>
+    <p>{{ flower.fertilizer_usage|default:"Describe drying, shredding, and mixing guidance for fertilizer production." }}</p>
+  </div>
+</section>
+{% endblock %}

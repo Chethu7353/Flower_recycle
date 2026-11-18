@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Register | PushpaRecycle{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-panel">
+    <p class="eyebrow dark">Join the network</p>
+    <h1>Register</h1>
+    <form method="post" class="stacked-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <label>Full Name{{ form.full_name }}</label>
+      <label>Email{{ form.email }}</label>
+      <label>Phone Number{{ form.phone }}</label>
+      <label>Password{{ form.password1 }}</label>
+      <label>Confirm Password{{ form.password2 }}</label>
+      <button class="btn btn-success w-100" type="submit">Create Account</button>
+    </form>
+    <div class="auth-links"><a href="{% url 'login' %}">Already have an account?</a></div>
+  </div>
+</section>
+{% endblock %}

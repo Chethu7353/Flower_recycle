@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SONPK Collector Dashboard — PushpaRecycle{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge bg-success bg-opacity-20 text-success rounded-pill px-3 py-1 fw-bold">SONPK Collector Portal</span>
+        <span class="text-muted small">| Field Representative: {{ user.full_name }}</span>
+      </div>
+      <h1 class="h3 fw-black text-dark mb-0">Daily Collection Operations</h1>
+      <p class="text-muted small mb-0">Pick up temple flower waste, verify weights, and update collection records.</p>
+    </div>
+
+    <div>
+      <a href="{% url 'collector_submissions_list' %}" class="btn btn-success fw-bold px-3 shadow-sm">
+        <i class="bi bi-card-checklist me-1"></i>View All Submissions & Temples
+      </a>
+    </div>
+  </div>
+
+  <!-- Operational Statistics -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">Pending Pickups</span>
+          <span class="p-2 rounded-circle bg-warning bg-opacity-15 text-warning"><i class="bi bi-hourglass-split"></i></span>
+        </div>
+        <div class="display-6 fw-black text-warning">{{ total_pending }}</div>
+        <div class="text-muted small">Waiting across temples</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">My Collections</span>
+          <span class="p-2 rounded-circle bg-success bg-opacity-15 text-success"><i class="bi bi-check2-all"></i></span>
+        </div>
+        <div class="display-6 fw-black text-success">{{ my_completed_count }}</div>
+        <div class="text-muted small">Batches verified by me</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">My Collected Weight</span>
+          <span class="p-2 rounded-circle bg-primary bg-opacity-15 text-primary"><i class="bi bi-speedometer2"></i></span>
+        </div>
+        <div class="display-6 fw-black text-dark">{{ my_collected_weight|floatformat:1 }} <small class="fs-6 text-muted">kg</small></div>
+        <div class="text-muted small">Transported to processing</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">Total Submissions</span>
+          <span class="p-2 rounded-circle bg-light text-secondary"><i class="bi bi-inbox-fill"></i></span>
+        </div>
+        <div class="display-6 fw-black text-secondary">{{ system_total_submissions }}</div>
+        <div class="text-muted small">System wide records</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Priority Pending Submissions Awaiting Pickup -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
+    <div class="card-header bg-white border-bottom p-3 p-md-4 d-flex justify-content-between align-items-center">
+      <div>
+        <h4 class="h5 fw-bold mb-0 text-warning d-flex align-items-center gap-2">
+          <i class="bi bi-exclamation-circle-fill"></i> Pending Flower Submissions (Action Required)
+        </h4>
+        <p class="text-muted small mb-0">Visit the temple location, weigh the floral waste, and record the collection.</p>
+      </div>
+      <a href="{% url 'collector_submissions_list' %}?status=ACTIVE_PENDING" class="btn btn-sm btn-outline-warning fw-semibold">
+        View All Pending
+      </a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light text-muted small text-uppercase">
+          <tr>
+            <th class="ps-4">Temple Name & Address</th>
+            <th>Contact Details</th>
+            <th>Flower Type</th>
+            <th>Weight</th>
+            <th>Date Logged</th>
+            <th>Status</th>
+            <th class="text-end pe-4">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sub in pending_submissions %}
+            <tr>
+              <td class="ps-4">
+                <strong class="text-dark d-block">{{ sub.temple.name }}</strong>
+                <span class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ sub.temple.address }}</span>
+              </td>
+              <td class="small">
+                <div><i class="bi bi-person me-1 text-secondary"></i>{{ sub.temple.contact_person|default:"Temple Coordinator" }}</div>
+                <div class="text-muted"><i class="bi bi-telephone me-1 text-secondary"></i>{{ sub.temple.contact_number }}</div>
+              </td>
+              <td>
+                <span class="fw-bold text-dark">{{ sub.flower_type }}</span>
+                {% if sub.remarks %}
+                  <div class="text-muted small text-truncate" style="max-width: 160px;">"{{ sub.remarks }}"</div>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-warning bg-opacity-20 text-dark border border-warning fs-6 px-2 py-1">{{ sub.weight }} kg</span>
+              </td>
+              <td class="small text-muted">
+                {{ sub.submission_date|date:"d M Y" }}
+              </td>
+              <td>
+                <span class="badge-status-pill badge-pending"><i class="bi bi-hourglass-split me-1"></i>{{ sub.get_status_display }}</span>
+              </td>
+              <td class="text-end pe-4">
+                <a href="{% url 'collector_record_collection' sub.pk %}" class="btn btn-sm btn-success fw-bold px-3">
+                  <i class="bi bi-check-lg me-1"></i>Collect Flowers
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">
+                <i class="bi bi-check-circle fs-2 d-block mb-2 text-success"></i>
+                Great job! No pending collections at this moment.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Collections Recorded by this Collector -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+    <div class="card-header bg-white border-bottom p-3 p-md-4">
+      <h4 class="h5 fw-bold mb-0 text-dark">My Recent Collection History</h4>
+      <p class="text-muted small mb-0">Record of verified temple collections completed by you.</p>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light text-muted small text-uppercase">
+          <tr>
+            <th class="ps-4">Collection Time</th>
+            <th>Temple</th>
+            <th>Flower Type</th>
+            <th>Collected Weight</th>
+            <th>Collector Notes</th>
+            <th class="text-end pe-4">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for col in my_collections %}
+            <tr>
+              <td class="ps-4 text-dark fw-semibold small">
+                {{ col.collected_at|date:"d M Y, h:i A" }}
+              </td>
+              <td>
+                <strong class="text-dark">{{ col.submission.temple.name }}</strong>
+                <div class="text-muted small">{{ col.submission.temple.city }}</div>
+              </td>
+              <td>
+                <span class="fw-semibold text-secondary">{{ col.submission.flower_type }}</span>
+              </td>
+              <td>
+                <span class="badge bg-success bg-opacity-15 text-success fs-6 border border-success border-opacity-25 px-2 py-1">
+                  {{ col.collected_weight }} kg
+                </span>
+              </td>
+              <td class="small text-muted text-truncate" style="max-width: 200px;">
+                {{ col.remarks|default:"Collected successfully." }}
+              </td>
+              <td class="text-end pe-4">
+                <span class="badge-status-pill badge-collected"><i class="bi bi-check-circle-fill me-1"></i>Completed</span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted small">
+                No past collections logged yet by your account.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

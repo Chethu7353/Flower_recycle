@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Collection | PushpaRecycle{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <p class="eyebrow dark">{{ collection.get_status_display }}</p>
+    <h1>{{ collection.temple.name }}</h1>
+  </div>
+</section>
+<section class="content-band py-5">
+  <div class="container">
+    <article class="detail-card">
+      <dl class="detail-list two-col">
+        <dt>Flower Type</dt><dd>{{ collection.flower.name }}</dd>
+        <dt>Quantity</dt><dd>{{ collection.quantity }} kg</dd>
+        <dt>Collection Date</dt><dd>{{ collection.collection_date }}</dd>
+        <dt>Collector</dt><dd>{{ collection.collector.full_name }}</dd>
+        <dt>Status</dt><dd>{{ collection.get_status_display }}</dd>
+        <dt>Remarks</dt><dd>{{ collection.remarks|default:"No remarks" }}</dd>
+      </dl>
+      <div class="d-flex gap-2 mt-4">
+        <a class="btn btn-success" href="{% url 'collection_update' collection.pk %}">Edit Collection</a>
+        <a class="btn btn-outline-danger" href="{% url 'collection_delete' collection.pk %}">Delete</a>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

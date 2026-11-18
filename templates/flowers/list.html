@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Flower Types | PushpaRecycle{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <p class="eyebrow dark">Flower Database</p>
+    <h1>Flower Types</h1>
+    <form class="filter-bar" method="get">
+      <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Search flower name">
+      <select name="quality"><option value="">Quality</option>{% for value, label in qualities %}<option value="{{ value }}" {% if request.GET.quality == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+      <button class="btn btn-success" type="submit">Filter</button>
+    </form>
+  </div>
+</section>
+<section class="content-band py-5">
+  <div class="container">
+    <div class="row g-4">
+      {% for flower in flowers %}
+        <div class="col-lg-4 col-md-6">
+          <article class="data-card">
+            {% if flower.image %}<img src="{{ flower.image.url }}" alt="{{ flower.name }}">{% else %}<div class="image-fallback flower-bg"></div>{% endif %}
+            <div class="p-4">
+              <h2>{{ flower.name }}</h2>
+              <dl class="mini-list">
+                <dt>Nitrogen</dt><dd>{{ flower.nitrogen_content }}</dd>
+                <dt>Freshness</dt><dd>{{ flower.freshness_duration }}</dd>
+                <dt>Decomposition</dt><dd>{{ flower.decomposition_rate }}</dd>
+                <dt>Potential</dt><dd>{{ flower.fertilizer_potential }}</dd>
+              </dl>
+              <a class="btn btn-outline-success w-100" href="{{ flower.get_absolute_url }}">View Details</a>
+            </div>
+          </article>
+        </div>
+      {% empty %}
+        <p class="empty-state">No flowers match the current filters.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

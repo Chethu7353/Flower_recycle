@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta.title }} — PushpaRecycle{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      
+      <!-- Role Switcher Pills -->
+      <div class="d-flex justify-content-center gap-2 mb-4">
+        <a href="{% url 'login_temple' %}" class="btn btn-sm {% if expected_role == 'TEMPLE_OWNER' %}btn-warning fw-bold{% else %}btn-outline-secondary{% endif %}">
+          <i class="bi bi-building me-1"></i>Temple Owner
+        </a>
+        <a href="{% url 'login_collector' %}" class="btn btn-sm {% if expected_role == 'COLLECTOR' %}btn-success fw-bold{% else %}btn-outline-secondary{% endif %}">
+          <i class="bi bi-truck me-1"></i>SONPK Collector
+        </a>
+        <a href="{% url 'login_admin' %}" class="btn btn-sm {% if expected_role == 'ADMIN' %}btn-primary fw-bold{% else %}btn-outline-secondary{% endif %}">
+          <i class="bi bi-shield-lock me-1"></i>Admin Dept
+        </a>
+      </div>
+
+      <!-- Main Login Card -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+        <div class="text-center mb-4">
+          <div class="d-inline-flex p-3 rounded-circle mb-3 {% if expected_role == 'TEMPLE_OWNER' %}bg-warning bg-opacity-15 text-warning{% elif expected_role == 'COLLECTOR' %}bg-success bg-opacity-15 text-success{% elif expected_role == 'ADMIN' %}bg-primary bg-opacity-15 text-primary{% else %}bg-secondary bg-opacity-15 text-dark{% endif %}">
+            <i class="bi {{ meta.icon }} fs-2"></i>
+          </div>
+          <h2 class="h4 fw-bold mb-1">{{ meta.title }}</h2>
+          <p class="text-muted small mb-0">{{ meta.tagline }}</p>
+        </div>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2 small mb-3">
+              {% for error in form.non_field_errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if not expected_role %}
+            <div class="mb-3">
+              <label for="{{ form.role.id_for_label }}" class="form-label small fw-bold">Select Portal / Role</label>
+              {{ form.role }}
+              {% if form.role.errors %}
+                <div class="text-danger small mt-1">{{ form.role.errors.0 }}</div>
+              {% endif %}
+            </div>
+          {% else %}
+            {{ form.role }}
+          {% endif %}
+
+          <div class="mb-3">
+            <label for="{{ form.email.id_for_label }}" class="form-label small fw-bold">Email Address</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-4">
+            <label for="{{ form.password.id_for_label }}" class="form-label small fw-bold">Password</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+              <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="btn w-100 py-2 fw-bold shadow-sm {% if expected_role == 'TEMPLE_OWNER' %}btn-warning{% elif expected_role == 'COLLECTOR' %}btn-success{% elif expected_role == 'ADMIN' %}btn-primary{% else %}btn-dark{% endif %}">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Sign In to Dashboard
+          </button>
+        </form>
+
+        <div class="text-center mt-4 pt-3 border-top">
+          <a href="{% url 'welcome' %}" class="text-muted small text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i>Back to Welcome Page
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Demo Credentials Guide -->
+      <div class="card border-0 shadow-sm rounded-4 p-3 mt-3 bg-light">
+        <h6 class="fw-bold small text-muted text-uppercase mb-2"><i class="bi bi-info-circle me-1"></i>Demo Accounts for Testing:</h6>
+        <div class="small text-secondary">
+          <div class="mb-1"><strong>Temple Owner:</strong> <code>temple@pushparecycle.local</code> / <code>Temple@12345</code></div>
+          <div class="mb-1"><strong>SONPK Collector:</strong> <code>collector@pushparecycle.local</code> / <code>Collector@12345</code></div>
+          <div><strong>Admin Dept:</strong> <code>admin@pushparecycle.local</code> / <code>Admin@12345</code></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

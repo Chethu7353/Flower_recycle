@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Submission #{{ submission.id }} — PushpaRecycle{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <a href="{% url 'temple_dashboard' %}" class="text-muted text-decoration-none small d-inline-flex align-items-center mb-3">
+        <i class="bi bi-arrow-left me-1"></i>Back to Temple Dashboard
+      </a>
+
+      <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white mb-4">
+        
+        <div class="d-flex justify-content-between align-items-start gap-3 border-bottom pb-3 mb-4">
+          <div>
+            <span class="badge bg-warning bg-opacity-20 text-dark rounded-pill px-3 py-1 fw-bold small mb-2">Submission Details</span>
+            <h1 class="h3 fw-bold text-dark mb-1">{{ submission.flower_type }}</h1>
+            <p class="text-muted small mb-0">{{ submission.temple.name }} — Submitted on {{ submission.submission_date|date:"l, d F Y" }}</p>
+          </div>
+          <div>
+            {% if submission.status == 'COLLECTED' %}
+              <span class="badge-status-pill badge-collected fs-6"><i class="bi bi-check-circle-fill me-1"></i>Collected</span>
+            {% elif submission.status == 'PENDING' %}
+              <span class="badge-status-pill badge-pending fs-6"><i class="bi bi-hourglass-split me-1"></i>Pending Collection</span>
+            {% else %}
+              <span class="badge-status-pill badge-submitted fs-6"><i class="bi bi-clock-history me-1"></i>Submitted</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-sm-6">
+            <div class="p-3 rounded-3 bg-light">
+              <span class="text-muted small d-block">Submitted Flower Weight</span>
+              <strong class="fs-4 text-dark">{{ submission.weight }} kg</strong>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded-3 bg-light">
+              <span class="text-muted small d-block">Submission Timestamp</span>
+              <strong class="fs-5 text-dark">{{ submission.created_at|date:"d M Y, h:i A" }}</strong>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="p-3 rounded-3 bg-light">
+              <span class="text-muted small d-block mb-1">Temple Remarks</span>
+              <p class="text-secondary mb-0">{{ submission.remarks|default:"No additional remarks provided." }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Collection Record (if collected) -->
+        {% if submission.collection_record %}
+          <div class="border rounded-4 p-4 bg-success bg-opacity-10 border-success border-opacity-25 mt-3">
+            <h5 class="fw-bold text-success mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-check2-circle fs-4"></i> Verified Collection Record
+            </h5>
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Responsible Collector</span>
+                <strong class="text-dark">{{ submission.collection_record.collector.full_name }}</strong>
+                <div class="text-muted small">{{ submission.collection_record.collector.phone }}</div>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Collection Date & Time</span>
+                <strong class="text-dark">{{ submission.collection_record.collected_at|date:"d M Y, h:i A" }}</strong>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Verified Collected Weight</span>
+                <strong class="text-success fs-5">{{ submission.collection_record.collected_weight }} kg</strong>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Collector Observation / Remarks</span>
+                <p class="text-secondary small mb-0">{{ submission.collection_record.remarks|default:"Collected in good condition." }}</p>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="border rounded-4 p-4 bg-light text-center mt-3">
+            <i class="bi bi-truck fs-1 text-muted d-block mb-2"></i>
+            <h6 class="fw-bold text-dark mb-1">Awaiting SONPK Collector Visit</h6>
+            <p class="text-muted small mb-0">An authorized SONPK collector will arrive to pick up this batch. The status will update automatically once weighed and loaded.</p>
+          </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

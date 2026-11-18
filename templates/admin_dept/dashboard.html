@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Department Overview — PushpaRecycle{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge bg-primary bg-opacity-20 text-primary rounded-pill px-3 py-1 fw-bold">Admin Department</span>
+        <span class="text-muted small">| Administrator: {{ user.full_name }}</span>
+      </div>
+      <h1 class="h3 fw-black text-dark mb-0">Platform Overview & Management</h1>
+      <p class="text-muted small mb-0">Central monitoring of all registered temples, owners, collectors, and collection workflows.</p>
+    </div>
+
+    <div class="d-flex gap-2">
+      <a href="{% url 'admin_user_create' %}" class="btn btn-primary fw-bold px-3 shadow-sm">
+        <i class="bi bi-person-plus me-1"></i>Create User Account
+      </a>
+      <a href="{% url 'admin_temple_create' %}" class="btn btn-outline-primary fw-semibold px-3">
+        <i class="bi bi-building-add me-1"></i>Register Temple
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Statistics Metrics Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">Registered Temples</span>
+          <span class="p-2 rounded-circle bg-warning bg-opacity-15 text-warning"><i class="bi bi-building"></i></span>
+        </div>
+        <div class="display-6 fw-black text-dark">{{ total_temples }}</div>
+        <div class="text-muted small">{{ total_owners }} assigned Temple Owners</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">SONPK Collectors</span>
+          <span class="p-2 rounded-circle bg-success bg-opacity-15 text-success"><i class="bi bi-truck"></i></span>
+        </div>
+        <div class="display-6 fw-black text-success">{{ total_collectors }}</div>
+        <div class="text-muted small">Field collection personnel</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">Collection Progress</span>
+          <span class="p-2 rounded-circle bg-info bg-opacity-15 text-info"><i class="bi bi-pie-chart-fill"></i></span>
+        </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <span class="display-6 fw-black text-dark">{{ completed_collections }}</span>
+          <span class="text-muted">/ {{ total_submissions }}</span>
+        </div>
+        <div class="text-warning small fw-semibold">{{ pending_collections }} pending collections</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-bold text-uppercase">Total Collected Weight</span>
+          <span class="p-2 rounded-circle bg-primary bg-opacity-15 text-primary"><i class="bi bi-recycle"></i></span>
+        </div>
+        <div class="display-6 fw-black text-primary">{{ total_weight_collected|floatformat:1 }} <small class="fs-6 text-muted">kg</small></div>
+        <div class="text-muted small">Diverted from waste streams</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Management Hub -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <a href="{% url 'admin_users_list' %}" class="card border-0 shadow-sm rounded-4 p-3 bg-white text-decoration-none h-100 hub-card">
+        <div class="d-flex align-items-center gap-3">
+          <div class="p-3 rounded-3 bg-primary bg-opacity-10 text-primary"><i class="bi bi-people-fill fs-3"></i></div>
+          <div>
+            <h5 class="fw-bold text-dark mb-0">User Management</h5>
+            <small class="text-muted">Create & activate accounts</small>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-3">
+      <a href="{% url 'admin_temples_list' %}" class="card border-0 shadow-sm rounded-4 p-3 bg-white text-decoration-none h-100 hub-card">
+        <div class="d-flex align-items-center gap-3">
+          <div class="p-3 rounded-3 bg-warning bg-opacity-10 text-warning"><i class="bi bi-building fs-3"></i></div>
+          <div>
+            <h5 class="fw-bold text-dark mb-0">Temples</h5>
+            <small class="text-muted">Manage temples & owners</small>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-3">
+      <a href="{% url 'admin_submissions_list' %}" class="card border-0 shadow-sm rounded-4 p-3 bg-white text-decoration-none h-100 hub-card">
+        <div class="d-flex align-items-center gap-3">
+          <div class="p-3 rounded-3 bg-info bg-opacity-10 text-info"><i class="bi bi-inbox-fill fs-3"></i></div>
+          <div>
+            <h5 class="fw-bold text-dark mb-0">Submissions</h5>
+            <small class="text-muted">Filter by temple & status</small>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-3">
+      <a href="{% url 'admin_collections_list' %}" class="card border-0 shadow-sm rounded-4 p-3 bg-white text-decoration-none h-100 hub-card">
+        <div class="d-flex align-items-center gap-3">
+          <div class="p-3 rounded-3 bg-success bg-opacity-10 text-success"><i class="bi bi-clipboard-check-fill fs-3"></i></div>
+          <div>
+            <h5 class="fw-bold text-dark mb-0">Collections</h5>
+            <small class="text-muted">Collector audit & logs</small>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Activity Split Grid -->
+  <div class="row g-4">
+    
+    <!-- Recent Submissions -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden h-100">
+        <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0 text-dark">Recent Submissions</h5>
+          <a href="{% url 'admin_submissions_list' %}" class="btn btn-sm btn-outline-secondary">View All</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light text-muted text-uppercase">
+              <tr>
+                <th class="ps-3">Temple</th>
+                <th>Variety</th>
+                <th>Weight</th>
+                <th class="text-end pe-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sub in recent_submissions %}
+                <tr>
+                  <td class="ps-3 fw-semibold text-dark">{{ sub.temple.name }}</td>
+                  <td>{{ sub.flower_type }}</td>
+                  <td><span class="badge bg-light text-dark border">{{ sub.weight }} kg</span></td>
+                  <td class="text-end pe-3">
+                    {% if sub.status == 'COLLECTED' %}
+                      <span class="badge-status-pill badge-collected">Collected</span>
+                    {% elif sub.status == 'PENDING' %}
+                      <span class="badge-status-pill badge-pending">Pending</span>
+                    {% else %}
+                      <span class="badge-status-pill badge-submitted">Submitted</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center py-4 text-muted">No submissions recorded yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Collections -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden h-100">
+        <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0 text-dark">Recent Completed Collections</h5>
+          <a href="{% url 'admin_collections_list' %}" class="btn btn-sm btn-outline-secondary">View All</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light text-muted text-uppercase">
+              <tr>
+                <th class="ps-3">Temple</th>
+                <th>Collector</th>
+                <th>Weight</th>
+                <th class="text-end pe-3">Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for col in recent_collections %}
+                <tr>
+                  <td class="ps-3 fw-semibold text-dark">{{ col.submission.temple.name }}</td>
+                  <td>{{ col.collector.full_name }}</td>
+                  <td><span class="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25">{{ col.collected_weight }} kg</span></td>
+                  <td class="text-end pe-3 text-muted">{{ col.collected_at|date:"d M, h:i A" }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center py-4 text-muted">No completed collections yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
