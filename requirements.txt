@@ -9,3 +9,5 @@ Pillow==10.3.0
 whitenoise==6.7.0
 requests>=2.31.0
 cryptography>=42.0.0
+pip install gunicorn
+pip freeze > requirements.txt
