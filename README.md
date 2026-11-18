@@ -1,3 +1,4 @@
+HEAD
 # PushpaRecycle
 
 Production-ready Django 5 + DRF web application for recycling temple flower waste into organic fertilizer.
@@ -108,3 +109,6 @@ POSTGRES_PORT=5432
 - `GET|POST /api/collections/`
 - `GET|PUT|PATCH|DELETE /api/collections/{id}/`
 - `GET /api/dashboard/statistics/`
+
+# Flower_recycle
+aa4f3f980575777b90f19ce746a4293fac42ffd0
